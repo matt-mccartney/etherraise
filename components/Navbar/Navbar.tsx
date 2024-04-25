@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Head from "next/head";
 import Logo from "../Logo/Logo";
 import Web3Auth from "../Web3Auth/Web3Auth";

@@ -43,7 +43,7 @@ export default function Web3Auth() {
 
     getConnectedAccounts().then((accounts) => {
       if (Array(accounts).length > 0) {
-        setConnection(Array(accounts)[0]); // Set the first account as the connected account
+        setConnection(String(Array(accounts)[0])); // Set the first account as the connected account
       }
     });
 

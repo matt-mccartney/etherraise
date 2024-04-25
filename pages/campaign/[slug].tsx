@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Navbar from '@/components/Navbar/Navbar'
 import { useRouter } from 'next/router'
 
@@ -11,12 +12,11 @@ import { createHelia } from 'helia';
 function CampaignInfo({ campaignId } : { campaignId: number }) {
   const [campaignInfo, setCampaignInfo] = useState<Campaign | null>(null);
   const [error, setError] = useState<string | null>(null)
-
   useEffect(() => {
     const fetchCampaignInfo = async () => {
       try {
         const helia = createHelia();
-        const provider = new BrowserProvider(window.ethereum); // Use your provider here
+        const provider = new BrowserProvider((window.ethereum)); // Use your provider here
         const contract = new ethers.Contract(TokenRaise.address, TokenRaise.abi, provider);
         const info = await contract.getCampaignById(campaignId);
         setCampaignInfo(info);

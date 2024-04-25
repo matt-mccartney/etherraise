@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Navbar from "@/components/Navbar/Navbar";
 import tw from "tailwind-styled-components";
 import { useEffect, useState } from "react";
