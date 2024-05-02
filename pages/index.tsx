@@ -7,12 +7,14 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import tw from "tailwind-styled-components";
 import TokenRaise from "@/contracts/TokenRaise.json";
+import Campaign from "@/components/Campaign/Campaign";
+import { Campaign as CampaignType } from "@/library/types/Campaign";
 
 const PageSection = tw.div<any>`max-w-[1200px] mx-auto py-8`;
 
 export default function Home() {
   const router = useRouter();
-  const [campaigns, setCampaigns] = useState([])
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
 
   useEffect(() => {
     let fetchCampaigns = async () => {
@@ -24,10 +26,10 @@ export default function Home() {
         TokenRaise.abi,
         signer
       );
-      return tokenRaise.getAllCampaigns()
+      return tokenRaise.getAllCampaigns();
     };
 
-    fetchCampaigns().then(x => console.log(x))
+    fetchCampaigns().then((x) => setCampaigns(x));
   }, []);
 
   return (
@@ -48,12 +50,18 @@ export default function Home() {
           </CTAButton>
         </section>
         <PageSection>
-          <Showcase data={[]} />
+          <Showcase data={campaigns} />
         </PageSection>
         <PageSection id="campaigns">
           <h1 className="text-white text-3xl font-semibold">
             Popular Projects
           </h1>
+          <div className="flex flex-row gap-8 mt-2">
+            {campaigns.map((campaign, index) => {
+              console.log(campaign);
+              return <Campaign key={index} i={index+1} campaign={campaign} />;
+            })}
+          </div>
         </PageSection>
         <PageSection></PageSection>
         <PageSection></PageSection>

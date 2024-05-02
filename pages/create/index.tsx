@@ -9,11 +9,11 @@ import { useWeb3 } from "@/components/Web3Auth/Web3Context";
 import { ArrowUpTrayIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import { formDataToJSON, parseURI } from "@/library/utils";
+import { Input } from "@/components/common";
 
 const FileUpload = tw.input<any>`hidden`;
 const FileUploadLabel = tw.label<any>`flex justify-center items-center rounded w-96 h-96 border border-dashed hover:border-solid hover:bg-white/5 border-white/10`;
 const FormLabel = tw.label<any>`mt-3 text-medium font-medium`;
-const Input = tw.input<any>`p-px px-2 rounded bg-transparent outline-none border focus:border-white border-white/10`;
 
 export default function InvestorPortal() {
   const { connection } = useWeb3();

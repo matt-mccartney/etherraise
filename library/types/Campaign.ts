@@ -3,14 +3,20 @@ export interface CampaignUpdate {
     content: string;
 }
 
+export type Metadata = {
+    title: string;
+    description: string | null;
+    image: string | null;
+    owner: string;
+  }
+
 export interface Campaign {
+    active: boolean;
     title: string;
     description: string;
     owner: string;
     currentFundsRaised: number;
     fundingGoal: number;
     deadline: number;
-    startDate: number;
-    endDate: number;
-    updates: CampaignUpdate[];
+    metadataCID: string;
 }

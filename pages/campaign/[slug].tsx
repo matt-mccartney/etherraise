@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Navbar from "@/components/Navbar/Navbar";
 import { useRouter } from "next/router";
-import { formatRelative } from 'date-fns'
+import { formatRelative } from "date-fns";
 
 import { useEffect, useState } from "react";
 import { ethers, formatEther } from "ethers";
@@ -12,12 +12,17 @@ import { createHelia } from "helia";
 import { Tab } from "@headlessui/react";
 import tw from "tailwind-styled-components";
 import { Bars3BottomLeftIcon } from "@heroicons/react/24/solid";
-import { ClockIcon } from "@heroicons/react/24/outline";
+import { BanknotesIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { Button, Input } from "@/components/common";
+import { fetchCampaignInfo } from "@/library/utils";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+const DonationContainer = tw.div<any>`border-white/10 border rounded flex flex-row w-full`
+const CampaignContainer = tw.div<any>`text-white max-w-[1000px] flex flex-col-reverse md:flex-row gap-8`;
+const CampaignContentRow = tw.div<any>`flex-col flex gap-8 w-full`;
 const InfoContainer = ({ title, canCollapse, children, icon = null }) => {
   return (
     <div className={`rounded bg-black/5 border border-white/10`}>
@@ -33,32 +38,13 @@ const InfoContainer = ({ title, canCollapse, children, icon = null }) => {
 };
 
 function CampaignInfo({ campaignId }: { campaignId: number }) {
+  const [donation, setDonation] = useState<number>(0);
   const [campaignInfo, setCampaignInfo] = useState<Campaign | null>(null);
   const [metadata, setMetadata] = useState<object | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    const fetchCampaignInfo = async () => {
-      try {
-        const provider = new BrowserProvider(window.ethereum); // Use your provider here
-        const contract = new ethers.Contract(
-          TokenRaise.address,
-          TokenRaise.abi,
-          provider
-        );
-        const info = await contract.getCampaignById(campaignId);
-        const metadata = await (
-          await fetch(`https://ipfs.io/ipfs/${info.metadataCID}`)
-        ).json();
-        setCampaignInfo(info);
-        setMetadata(metadata);
-      } catch (error) {
-        console.error("Error fetching campaign info:", error);
-        setError(String(error));
-      }
-    };
-
     if (campaignId) {
-      fetchCampaignInfo();
+      fetchCampaignInfo(campaignId, setCampaignInfo, setMetadata, setError);
     }
 
     return () => {
@@ -73,17 +59,17 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
   }
 
   return (
-    <div className="text-white max-w-[1000px] flex flex-row gap-8">
-      <div className="flex-col flex gap-8">
-        <img src={metadata.image} className="rounded w-[400px]"></img>
+    <CampaignContainer>
+      <CampaignContentRow>
+        <img src={metadata.image} className="rounded"></img>
         <InfoContainer
           icon={<Bars3BottomLeftIcon className="h-5 w-5" />}
           title={`Description`}
         >
           <p className="text-white/70">{metadata.description}</p>
         </InfoContainer>
-      </div>
-      <div className="flex-col flex gap-8">
+      </CampaignContentRow>
+      <CampaignContentRow>
         <div>
           <h2
             className={
@@ -98,30 +84,45 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
             Launched by {campaignInfo.creator}
           </p>
         </div>
-        <InfoContainer icon={<ClockIcon className="w-5 h-5"/>} title={`Fundraising ends ${formatRelative(new Date(
-              Number(campaignInfo.deadline) * 1000
-            ), new Date())}`}>
-          <p>Funding Goal: {formatEther(campaignInfo.fundingGoal)} ETH</p>
-          <p>
-            Current Funds Raised: {formatEther(campaignInfo.currentFundsRaised)}{" "}
-            ETH
-          </p>
-          <p>
-            Deadline:{" "}
-            {new Date(
-              Number(campaignInfo.deadline) * 1000
-            ).toLocaleDateString()}
-          </p>
-          <progress
-            className="[&::-webkit-progress-bar]:rounded-lg [&::-webkit-progress-value]:rounded-lg [&::-webkit-progress-bar]:bg-slate-300 [&::-webkit-progress-value]:bg-violet-500 [&::-moz-progress-bar]:bg-violet-500"
-            value={
-              Number(campaignInfo.currentFundsRaised) /
-              Number(campaignInfo.fundingGoal)
-            }
-          ></progress>
+        <InfoContainer
+          icon={<ClockIcon className="w-5 h-5" />}
+          title={`Fundraising ends ${formatRelative(
+            new Date(Number(campaignInfo.deadline) * 1000),
+            new Date()
+          )}`}
+        >
+          <div className="mb-2">
+            <progress
+              className="w-full [&::-webkit-progress-bar]:rounded-lg [&::-webkit-progress-value]:rounded-lg [&::-webkit-progress-bar]:bg-slate-300 [&::-webkit-progress-value]:bg-violet-500 [&::-moz-progress-bar]:bg-violet-500"
+              value={
+                Number(campaignInfo.currentFundsRaised) /
+                Number(campaignInfo.fundingGoal)
+              }
+            ></progress>
+            <p className="text-xs text-white/70">
+              {formatEther(campaignInfo.currentFundsRaised)}/
+              {formatEther(campaignInfo.fundingGoal)} ETH
+            </p>
+          </div>
+          <div className="flex flex-row gap-2">
+            <DonationContainer>
+              <Input
+                type="number"
+                className={`border-none w-full p-none`}
+                value={donation}
+                onChange={(e: any) => setDonation(e.target.value)}
+              ></Input>
+              <p className="text-white/70 p-2">ETH</p>
+            </DonationContainer>
+            <Button>Donate</Button>
+          </div>
         </InfoContainer>
-      </div>
-    </div>
+        <InfoContainer
+          title={`Recent Contributions`}
+          icon={<BanknotesIcon className="w-5 h-5" />}
+        >Coming soon!</InfoContainer>
+      </CampaignContentRow>
+    </CampaignContainer>
   );
 }
 

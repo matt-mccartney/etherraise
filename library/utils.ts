@@ -1,4 +1,6 @@
 // @ts-nocheck
+import TokenRaise from "@/contracts/TokenRaise.json"
+import { BrowserProvider, ethers } from "ethers";
 
 export function toObject() {
   return JSON.parse(
@@ -38,3 +40,23 @@ export async function parseURI(d) {
     };
   });
 }
+
+export const fetchCampaignInfo = async (campaignId, setCampaignInfo, setMetadata, setError) => {
+    try {
+      const provider = new BrowserProvider(window.ethereum); // Use your provider here
+      const contract = new ethers.Contract(
+        TokenRaise.address,
+        TokenRaise.abi,
+        provider
+      );
+      const info = await contract.getCampaignById(campaignId);
+      const metadata = await (
+        await fetch(`https://ipfs.io/ipfs/${info.metadataCID}`)
+      ).json();
+      setCampaignInfo(info);
+      setMetadata(metadata);
+    } catch (error) {
+      console.error("Error fetching campaign info:", error);
+      setError(String(error));
+    }
+  };
