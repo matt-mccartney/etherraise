@@ -208,4 +208,32 @@ contract TokenRaise is Ownable {
             emit CampaignCompleted(_campaignId, campaigns[_campaignId].creator, campaigns[_campaignId].currentFundsRaised);
         }
     }
+
+    function getAllCampaigns() public view returns (Campaign[] memory) {
+        Campaign[] memory allCampaigns = new Campaign[](totalCampaigns);
+        for (uint256 i = 1; i <= totalCampaigns; i++) {
+            allCampaigns[i - 1] = campaigns[i];
+        }
+        return allCampaigns;
+    }
+
+    function getCampaignsByUser(address user) public view returns (Campaign[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 1; i <= totalCampaigns; i++) {
+            if (campaigns[i].creator == user) {
+                count++;
+            }
+        }
+
+        Campaign[] memory userCampaigns = new Campaign[](count);
+        uint256 index = 0;
+        for (uint256 j = 1; j <= totalCampaigns; j++) {
+            if (campaigns[j].creator == user) {
+                userCampaigns[index] = campaigns[j];
+                index++;
+            }
+        }
+        return userCampaigns;
+    }
+
 }
