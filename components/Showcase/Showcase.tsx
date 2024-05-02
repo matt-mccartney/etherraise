@@ -9,7 +9,6 @@ type ShowcaseProps = {
 
 export default function Showcase({ data } : ShowcaseProps) {
     const numCampaigns = data.length;
-
     const [currentCampaign, setCurrentCampaign] = useState(0);
 
     useEffect(() => {
