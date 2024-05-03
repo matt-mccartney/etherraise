@@ -59,7 +59,7 @@ export default function Home() {
           <div className="flex flex-row gap-8 mt-2">
             {campaigns.map((campaign, index) => {
               console.log(campaign);
-              return <Campaign key={index} i={index+1} campaign={campaign} />;
+              return <Campaign key={index} campaign={campaign} />;
             })}
           </div>
         </PageSection>

@@ -2,12 +2,11 @@ import Navbar from "@/components/Navbar/Navbar";
 import { BrowserProvider, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import TokenRaise from "@/contracts/TokenRaise.json";
-import { useRouter } from "next/router";
-import { Campaign } from "@/library/types/Campaign";
+import { Campaign as CampaignType } from "@/library/types/Campaign";
+import Campaign from "@/components/Campaign/Campaign";
 
 export default function Portal() {
-    const router = useRouter();
-    const [campaigns, setCampaigns] = useState<Campaign[]>([])
+    const [campaigns, setCampaigns] = useState<CampaignType[]>([])
 
     useEffect(() => {
         let fetchCampaigns = async () => {
@@ -28,7 +27,9 @@ export default function Portal() {
   return (
     <>
       <Navbar />
-      {campaigns.map((campaign, index) => <p>{campaign.title}</p>)}
+      <div className="p-8 flex flex-wrap gap-8">
+      {campaigns.map((campaign, index) => <Campaign campaign={campaign} key={index} />)}
+      </div>
     </>
   );
 }

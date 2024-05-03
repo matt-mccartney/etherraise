@@ -11,12 +11,13 @@ export type Metadata = {
   }
 
 export interface Campaign {
-    active: boolean;
+    id: number;
+    creator: string;
     title: string;
-    description: string;
-    owner: string;
-    currentFundsRaised: number;
-    fundingGoal: number;
-    deadline: number;
     metadataCID: string;
+    fundingGoal: number;
+    currentFundsRaised: number;
+    deadline: number;
+    active: boolean;
+    campaignToken: string;
 }

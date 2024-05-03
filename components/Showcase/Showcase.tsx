@@ -19,7 +19,7 @@ export default function Showcase({ data }: ShowcaseProps) {
   const [metadata, setMetadata] = useState<Metadata | null>(null);
 
   useEffect(() => {
-    if (!data[currentCampaign]?.metadataCID) {
+    if (!(data[currentCampaign]?.metadataCID)) {
       setMetadata(null);
       return;
     }

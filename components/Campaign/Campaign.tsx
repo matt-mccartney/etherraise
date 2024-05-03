@@ -4,10 +4,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function Campaign({
-  i,
   campaign,
 }: {
-  i: number;
   campaign: CampaignType;
 }) {
   const [metadata, setMetadata] = useState<Metadata | null>();
@@ -18,6 +16,7 @@ export default function Campaign({
       setMetadata(null);
       return;
     }
+    console.log(`https://ipfs.io/ipfs/${campaign.metadataCID}`)
     fetch(`https://ipfs.io/ipfs/${campaign.metadataCID}`)
       .then((resp) => resp.json())
       .then((json) => {
@@ -28,7 +27,7 @@ export default function Campaign({
 
   return (
     <div
-      onClick={() => router.push(`/campaign/${i}`)}
+      onClick={() => router.push(`/campaign/${campaign.id}`)}
       className="flex flex-col bg-white/5 drop-shadow rounded hover:-translate-y-1 transition-all max-w-56"
     >
       <div

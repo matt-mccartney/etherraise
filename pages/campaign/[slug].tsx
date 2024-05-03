@@ -1,13 +1,12 @@
-// @ts-nocheck
 import Navbar from "@/components/Navbar/Navbar";
 import { useRouter } from "next/router";
 import { formatRelative } from "date-fns";
 
 import { useEffect, useState } from "react";
-import { ethers, formatEther } from "ethers";
+import { ethers, formatEther, parseEther } from "ethers";
 import TokenRaise from "@/contracts/TokenRaise.json";
 import { BrowserProvider } from "ethers";
-import { Campaign } from "@/library/types/Campaign";
+import { Campaign, Metadata } from "@/library/types/Campaign";
 import { createHelia } from "helia";
 import { Tab } from "@headlessui/react";
 import tw from "tailwind-styled-components";
@@ -16,18 +15,20 @@ import { BanknotesIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { Button, Input } from "@/components/common";
 import { fetchCampaignInfo } from "@/library/utils";
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-const DonationContainer = tw.div<any>`border-white/10 border rounded flex flex-row w-full`
+const DonationContainer = tw.div<any>`border-white/10 border rounded flex flex-row w-full`;
 const CampaignContainer = tw.div<any>`text-white max-w-[1000px] flex flex-col-reverse md:flex-row gap-8`;
 const CampaignContentRow = tw.div<any>`flex-col flex gap-8 w-full`;
-const InfoContainer = ({ title, canCollapse, children, icon = null }) => {
+type InfoContainerProps = {
+  title?: string;
+  canCollapse?: boolean;
+  children: React.ReactNode;
+  icon:React.ReactNode;
+}
+const InfoContainer = ({ title, canCollapse, children, icon = null }:InfoContainerProps) => {
   return (
     <div className={`rounded bg-black/5 border border-white/10`}>
       {title && (
-        <div class={`border-b border-white/10 p-4 flex flex-row gap-2`}>
+        <div className={`border-b border-white/10 p-4 flex flex-row gap-2`}>
           {icon}
           <p>{title}</p>
         </div>
@@ -38,10 +39,28 @@ const InfoContainer = ({ title, canCollapse, children, icon = null }) => {
 };
 
 function CampaignInfo({ campaignId }: { campaignId: number }) {
-  const [donation, setDonation] = useState<number>(0);
+  const [donation, setDonation] = useState<bigint | number>(0);
   const [campaignInfo, setCampaignInfo] = useState<Campaign | null>(null);
-  const [metadata, setMetadata] = useState<object | null>(null);
+  const [metadata, setMetadata] = useState<Metadata | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+
+  const donateToCampaign = async () => {
+    const provider = new BrowserProvider(window.ethereum as any); // Use your provider here
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(
+      TokenRaise.address,
+      TokenRaise.abi,
+      signer
+    );
+    const options = {value: parseEther(String(donation))};
+    try {
+      const info = await contract.contributeToCampaign(campaignId, options);
+      setDonation(0);
+      return info;
+    } catch (err : any) {console.log(err)}
+    return;
+  };
+
   useEffect(() => {
     if (campaignId) {
       fetchCampaignInfo(campaignId, setCampaignInfo, setMetadata, setError);
@@ -61,12 +80,12 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
   return (
     <CampaignContainer>
       <CampaignContentRow>
-        <img src={metadata.image} className="rounded"></img>
+        <img src={metadata?.image ? metadata.image : ""} className="rounded"></img>
         <InfoContainer
           icon={<Bars3BottomLeftIcon className="h-5 w-5" />}
           title={`Description`}
         >
-          <p className="text-white/70">{metadata.description}</p>
+          <p className="text-white/70">{metadata?.description}</p>
         </InfoContainer>
       </CampaignContentRow>
       <CampaignContentRow>
@@ -114,13 +133,15 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
               ></Input>
               <p className="text-white/70 p-2">ETH</p>
             </DonationContainer>
-            <Button>Donate</Button>
+            <Button onClick={async () => {console.log("hello");await donateToCampaign()}}>Donate</Button>
           </div>
         </InfoContainer>
         <InfoContainer
           title={`Recent Contributions`}
           icon={<BanknotesIcon className="w-5 h-5" />}
-        >Coming soon!</InfoContainer>
+        >
+          Coming soon!
+        </InfoContainer>
       </CampaignContentRow>
     </CampaignContainer>
   );
