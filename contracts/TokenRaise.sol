@@ -61,6 +61,7 @@ contract TokenRaiseToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
 contract TokenRaise is Ownable {
     // Structure to represent a campaign
     struct Campaign {
+        uint256 id;
         address payable creator;
         string title;
         string metadataCID; // IPFS CID for campaign metadata
@@ -116,6 +117,7 @@ contract TokenRaise is Ownable {
         // Increment total campaigns count and create new campaign
         totalCampaigns++;
         campaigns[totalCampaigns] = Campaign(
+            totalCampaigns,
             payable(msg.sender),
             _title,
             _metadataCID,
@@ -145,24 +147,21 @@ contract TokenRaise is Ownable {
     }
 
     // Function to contribute funds to a campaign and receive tokens
-    function contributeToCampaign(uint256 _campaignId, uint256 _tokenAmount) external {
+    function contributeToCampaign(uint256 _campaignId) external payable {
         Campaign storage campaign = campaigns[_campaignId];
         
         require(campaign.active, "Campaign is not active");
-        require(_tokenAmount >= minContribution, "Minimum contribution not met");
+        require(msg.value >= minContribution, "Minimum contribution not met");
 
-        approveTokenSpending(_tokenAmount);
-        tokenRaise.transferFrom(msg.sender, address(this), _tokenAmount);
+        uint256 royaltyAmount = (msg.value * royaltyPercentage) / 100;
+        uint256 contributionMinusRoyalty = msg.value - royaltyAmount;
 
-        uint256 royaltyAmount = (_tokenAmount * royaltyPercentage) / 100;
-        uint256 contributionMinusRoyalty = _tokenAmount - royaltyAmount;
-
-        tokenRaise.transfer(campaign.creator, contributionMinusRoyalty);
-
+        campaign.creator.transfer(contributionMinusRoyalty);
         campaign.currentFundsRaised += contributionMinusRoyalty;
 
-        campaign.token.mint(msg.sender, _tokenAmount);
-        emit FundsContributed(_campaignId, msg.sender, _tokenAmount, royaltyAmount);
+        uint256 tokensToMint = (contributionMinusRoyalty * 10000) / 5;
+        campaign.token.mint(msg.sender, tokensToMint);
+        emit FundsContributed(_campaignId, msg.sender, contributionMinusRoyalty, royaltyAmount);
 
         checkCampaignCompletion(_campaignId);
     }
