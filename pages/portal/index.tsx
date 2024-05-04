@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import TokenRaise from "@/contracts/TokenRaise.json";
 import { Campaign as CampaignType } from "@/library/types/Campaign";
 import Campaign from "@/components/Campaign/Campaign";
+import { useWeb3 } from "@/components/Web3Auth/Web3Context";
 
 export default function Portal() {
+    let {connection} = useWeb3(); 
     const [campaigns, setCampaigns] = useState<CampaignType[]>([])
 
     useEffect(() => {
@@ -18,7 +20,7 @@ export default function Portal() {
             TokenRaise.abi,
             signer
           );
-          return tokenRaise.getCampaignsByUser("0x0db27006434aff8b28c47fC6d557CDE5c836c04a")
+          return tokenRaise.getCampaignsByUser(connection)
         };
     
         fetchCampaigns().then(x => setCampaigns(x))
