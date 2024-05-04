@@ -20,7 +20,7 @@ export default function Portal() {
             TokenRaise.abi,
             signer
           );
-          return tokenRaise.getCampaignsByUser(connection)
+          return tokenRaise.getCampaignsByUser(String(connection))
         };
     
         fetchCampaigns().then(x => setCampaigns(x))
