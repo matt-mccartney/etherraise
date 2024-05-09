@@ -58,7 +58,7 @@ export default function Home() {
           </CTAButton>
         </section>
         {!(connection === null || connection === "") && (
-          <>
+          <div className="mx-2">
             <PageSection>
               <Showcase data={campaigns !== undefined ? campaigns : []} />
             </PageSection>
@@ -69,7 +69,7 @@ export default function Home() {
                 })}
               </CampaignCarousel>
             </PageSection>
-          </>
+          </div>
         )}
         <NotConnected redirect={false} />
       </main>

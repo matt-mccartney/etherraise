@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import tw from "tailwind-styled-components";
 import React, { useEffect, useRef, useState } from "react";
 
-const CarouselBtn = tw.button<any>`transition-all h-full p-3 hover:bg-white/5 bg-white/[.025] border border-white/5 rounded-full text-white/50 hover:text-white mt-1`;
+const CarouselBtn = tw.button<any>`transition-all h-full p-3 hover:bg-white/5 bg-white/[.025] border border-white/5 rounded-full text-white/50 hover:text-white`;
 
 export default function CampaignCarousel({
   children,
