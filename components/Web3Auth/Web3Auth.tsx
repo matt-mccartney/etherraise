@@ -16,29 +16,27 @@ const getConnectedAccounts = async () => {
 
 export default function Web3Auth() {
   let { connection, setConnection } = useWeb3();
-  let [connectionName, setConnectionName] = useState<String | null>(null)
-  const [provider, setProvider] = useState<BrowserProvider | null>(null);
+  let [connectionName, setConnectionName] = useState<String | null>(null);
+  
 
   const initializeProvider = async () => {
     if (window.ethereum) {
       await window.ethereum.request({ method: "eth_requestAccounts" });
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      setProvider(provider);
     }
   };
 
   const getConnectionName = async () => {
     if (!window.ethereum || connection == null || connection == "") return;
-    const provider = new ethers.BrowserProvider(window.ethereum)
+    const provider = new ethers.BrowserProvider(window.ethereum);
     let names;
     try {
-      names = await provider.lookupAddress(connection)
+      names = await provider.lookupAddress(connection);
     } catch (err) {
       names = null;
     }
-    return ((names !== null && names?.length > 0) ? names :
-      String(connection).slice(0, 6) + `...` + String(connection).slice(-4)
-    );
+    return names !== null && names?.length > 0
+      ? names
+      : String(connection).slice(0, 6) + `...` + String(connection).slice(-4);
   };
 
   useEffect(() => {
@@ -56,7 +54,6 @@ export default function Web3Auth() {
       if (accounts.length === 0) {
         console.log("Please connect to MetaMask.");
         setConnection(null);
-        setProvider(null);
       } else {
         setConnection(
           Array(accounts).length > 0 ? String(Array(accounts)[0]) : null
@@ -70,10 +67,14 @@ export default function Web3Auth() {
       window.location.reload();
     };
 
-    getConnectedAccounts().then((accounts) => {
+    getConnectedAccounts().then((accounts: any) => {
       if (Array(accounts).length > 0) {
         setConnection(
-          Array(accounts).length > 0 ? String(Array(accounts)[0]) : null
+          Array(accounts).length > 0 &&
+            accounts !== null &&
+            accounts !== undefined
+            ? String(Array(accounts)[0])
+            : null
         ); // Set the first account as the connected account
         initializeProvider();
       }
@@ -96,10 +97,10 @@ export default function Web3Auth() {
 
   return (
     <>
-      {connection === "" && (
+      {(connection === "" || connection === null) && (
         <Button onClick={() => initializeProvider()}>Connect Wallet</Button>
       )}
-      {connection !== "" && (
+      {connection !== "" && connection !== null && connection !== undefined && (
         <Web3Menu>
           <Avatar
             src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${connection}`}

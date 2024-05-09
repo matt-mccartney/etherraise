@@ -1,4 +1,4 @@
-import { Campaign, Metadata } from "@/library/types/Campaign";
+import { Metadata } from "@/library/types/Campaign";
 import { useEffect, useState } from "react";
 import {
   ShowcaseContainer,
@@ -15,10 +15,10 @@ type ShowcaseProps = {
 export default function Showcase({ data }: ShowcaseProps) {
   const router = useRouter();
   const numCampaigns = data.length;
-  const [currentCampaign, setCurrentCampaign] = useState(0);
+  const [currentCampaign, setCurrentCampaign] = useState<number>(0);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
 
-  useEffect(() => {
+  const fetchMetadata = (currentCampaign: number) => {
     if (!(data[currentCampaign]?.metadataCID)) {
       setMetadata(null);
       return;
@@ -26,7 +26,15 @@ export default function Showcase({ data }: ShowcaseProps) {
     fetch(`https://ipfs.io/ipfs/${data[currentCampaign].metadataCID}`)
       .then((resp) => resp.json())
       .then((json) => setMetadata(json));
+  };
+
+  useEffect(() => {
+    fetchMetadata(currentCampaign);
   }, [currentCampaign]);
+
+  useEffect(() => {
+    fetchMetadata(0);
+  }, [data]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,7 +47,7 @@ export default function Showcase({ data }: ShowcaseProps) {
   return (
     <ShowcaseContainer
       style={{
-        backgroundImage: `url(${metadata?.image})`,
+        backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url(${metadata?.image})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -49,7 +57,12 @@ export default function Showcase({ data }: ShowcaseProps) {
           Featured Project
         </h2>
         <ShowcaseTitle>{data[currentCampaign]?.title}</ShowcaseTitle>
-        <CTAButton onClick={() => router.push(`/campaign/${currentCampaign + 1}`)} className="text-xs">View Campaign</CTAButton>
+        <CTAButton
+          onClick={() => router.push(`/campaign/${currentCampaign + 1}`)}
+          className="text-xs"
+        >
+          View Campaign
+        </CTAButton>
       </ShowcaseInfo>
     </ShowcaseContainer>
   );
