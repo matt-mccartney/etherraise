@@ -10,6 +10,8 @@ import { ArrowUpTrayIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import { formDataToJSON, parseURI } from "@/library/utils";
 import { Input } from "@/components/common";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import NotConnected from "@/components/NotConnected/NotConnected";
 
 const FileUpload = tw.input<any>`hidden`;
 const FileUploadLabel = tw.label<any>`flex justify-center items-center rounded w-96 h-96 border border-dashed hover:border-solid hover:bg-white/5 border-white/10`;
@@ -29,7 +31,6 @@ export default function InvestorPortal() {
 
   const uploadFile = async (title, desc, owner, image) => {
     try {
-      setUploading(true);
       const data = new FormData();
       data.append("title", title);
       data.append("description", desc);
@@ -43,7 +44,6 @@ export default function InvestorPortal() {
         }
       });
       const resData = await res.json();
-      setUploading(false);
       return resData.IpfsHash;
     } catch (e) {
       console.log(e);
@@ -75,8 +75,8 @@ export default function InvestorPortal() {
   };
 
   const createCampaign = async () => {
+    setUploading(true)
     const metadataCID = (await uploadToIPFS())?.toString();
-    console.log("THIS IS CID", metadataCID);
     if (!metadataCID) return;
     try {
       const provider = new BrowserProvider(window.ethereum);
@@ -94,7 +94,18 @@ export default function InvestorPortal() {
         tokenName,
         tokenSymbol
       );
+      setUploading(false);
     } catch (error) {
+      let data = new FormData();
+      data.append("cid", metadataCID)
+      const res = await fetch("/api/files", {
+        method: "DELETE",
+        body: formDataToJSON(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      setUploading(false);
       console.error("Error creating campaign:", error);
     }
   };
@@ -102,15 +113,15 @@ export default function InvestorPortal() {
   return (
     <>
       <Navbar />
-      <form
+      {!(connection === null || connection === "") && <form
         className="flex flex-col gap-12 text-white p-8 rounded-lg max-w-[1000px] mx-auto"
         onSubmit={(e) => {
           e.preventDefault();
           createCampaign();
         }}
       >
-        <div className="flex flex-row gap-12">
-          <div className="flex flex-col">
+        <div className="flex flex-col md:flex-row gap-12">
+          <div className="flex flex-col items-center">
             <FileUploadLabel>
               <FileUpload
                 id="campaignImg"
@@ -194,11 +205,13 @@ export default function InvestorPortal() {
             ></Input>
           </div>
         </div>
-        <input
-          className="p-2 rounded bg-violet-500 float-right"
+        <button
+          className={uploading ? "p-2 rounded float-right bg-gray-700" : "p-2 rounded bg-violet-500 float-right"}
           type="submit"
-        ></input>
-      </form>
+          disabled={uploading}
+        >{uploading ? <div className="flex flex-row gap-2 text-center justify-center items-center"><ArrowPathIcon className="animate-spin w-5 h-5"/></div> : `Create Campaign`}</button>
+      </form>}
+      <NotConnected/>
     </>
   );
 }
