@@ -12,7 +12,7 @@ import { useWeb3 } from "@/components/Web3Auth/Web3Context";
 import NotConnected from "@/components/NotConnected/NotConnected";
 import CampaignCarousel from "@/components/Carousel/Carousel";
 
-const PageSection = tw.div<any>`max-w-[1200px] mx-auto py-8`;
+const PageSection = tw.div<any>`w-full mx-auto py-8`;
 
 export default function Home() {
   const router = useRouter();

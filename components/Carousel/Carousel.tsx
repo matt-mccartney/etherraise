@@ -1,5 +1,3 @@
-import { Campaign as CampaignType } from "@/library/types/Campaign";
-import Campaign from "../Campaign/Campaign";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import tw from "tailwind-styled-components";
 import React, { useEffect, useRef, useState } from "react";
