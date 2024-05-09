@@ -91,7 +91,7 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
       <CampaignContentRow>
         <img
           src={metadata?.image ? metadata.image : ""}
-          className="rounded"
+          className="rounded w-96"
         ></img>
         <InfoContainer
           icon={<Bars3BottomLeftIcon className="h-5 w-5" />}

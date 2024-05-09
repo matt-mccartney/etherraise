@@ -46,7 +46,7 @@ const chevronMap: Record<number, ForwardRefExoticComponent<any>> = {
 
 function SortCategory({ title }: { title: SortCategory }) {
   const { category, setCategory, currentSort, setCurrentSort } =
-    useContext(SortContext);
+  useContext(SortContext);
   const [currSort, setCurrSort] = useState<number>(2);
 
   useEffect(() => {
