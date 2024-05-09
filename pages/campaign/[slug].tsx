@@ -14,6 +14,8 @@ import { Bars3BottomLeftIcon } from "@heroicons/react/24/solid";
 import { BanknotesIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { Button, Input } from "@/components/common";
 import { fetchCampaignInfo } from "@/library/utils";
+import { useWeb3 } from "@/components/Web3Auth/Web3Context";
+import NotConnected from "@/components/NotConnected/NotConnected";
 
 const DonationContainer = tw.div<any>`border-white/10 border rounded flex flex-row w-full`;
 const CampaignContainer = tw.div<any>`text-white max-w-[1000px] flex flex-col-reverse md:flex-row gap-8`;
@@ -22,9 +24,14 @@ type InfoContainerProps = {
   title?: string;
   canCollapse?: boolean;
   children: React.ReactNode;
-  icon:React.ReactNode;
-}
-const InfoContainer = ({ title, canCollapse, children, icon = null }:InfoContainerProps) => {
+  icon: React.ReactNode;
+};
+const InfoContainer = ({
+  title,
+  canCollapse,
+  children,
+  icon = null,
+}: InfoContainerProps) => {
   return (
     <div className={`rounded bg-black/5 border border-white/10`}>
       {title && (
@@ -52,12 +59,14 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
       TokenRaise.abi,
       signer
     );
-    const options = {value: parseEther(String(donation))};
+    const options = { value: parseEther(String(donation)) };
     try {
       const info = await contract.contributeToCampaign(campaignId, options);
       setDonation(0);
       return info;
-    } catch (err : any) {console.log(err)}
+    } catch (err: any) {
+      console.log(err);
+    }
     return;
   };
 
@@ -80,7 +89,10 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
   return (
     <CampaignContainer>
       <CampaignContentRow>
-        <img src={metadata?.image ? metadata.image : ""} className="rounded"></img>
+        <img
+          src={metadata?.image ? metadata.image : ""}
+          className="rounded"
+        ></img>
         <InfoContainer
           icon={<Bars3BottomLeftIcon className="h-5 w-5" />}
           title={`Description`}
@@ -133,7 +145,14 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
               ></Input>
               <p className="text-white/70 p-2">ETH</p>
             </DonationContainer>
-            <Button onClick={async () => {console.log("hello");await donateToCampaign()}}>Donate</Button>
+            <Button
+              onClick={async () => {
+                console.log("hello");
+                await donateToCampaign();
+              }}
+            >
+              Donate
+            </Button>
           </div>
         </InfoContainer>
         <InfoContainer
@@ -149,12 +168,16 @@ function CampaignInfo({ campaignId }: { campaignId: number }) {
 
 export default function Page() {
   const router = useRouter();
+  const { connection } = useWeb3();  
   return (
     <>
       <Navbar />
-      <div className="flex justify-center items-center p-12">
-        <CampaignInfo campaignId={Number(router.query.slug)}></CampaignInfo>
-      </div>
+      {!(connection === null || connection === "") && (
+        <div className="flex justify-center items-center p-12">
+          <CampaignInfo campaignId={Number(router.query.slug)}></CampaignInfo>
+        </div>
+      )}
+      <NotConnected/>
     </>
   );
 }
