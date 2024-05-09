@@ -1,17 +1,17 @@
 import { Campaign as CampaignType } from "@/library/types/Campaign";
-import Campaign from "./Campaign";
+import Campaign from "../Campaign/Campaign";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import tw from "tailwind-styled-components";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const CarouselBtn = tw.button<any>`transition-all h-full p-3 hover:bg-white/5 bg-white/[.025] border border-white/5 rounded-full text-white/50 hover:text-white mt-1`;
 
 export default function CampaignCarousel({
-  campaigns,
+  children,
   title = null,
 }: {
   title?: string | null;
-  campaigns: CampaignType[];
+  children: any;
 }) {
   const items = useRef<HTMLDivElement>(null);
   const [needsScroll, setNeedsScroll] = useState(false);
@@ -28,7 +28,7 @@ export default function CampaignCarousel({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [campaigns, window]);
+  }, [children, window]);
 
   const scroll = (dir: "right" | "left") => {
     if (items.current) {
@@ -60,9 +60,7 @@ export default function CampaignCarousel({
           ref={items}
           className="no-scrollbar flex flex-row gap-4 snap-x snap-proximity overflow-x-scroll grow"
         >
-          {campaigns?.map((campaign, index) => {
-            return <Campaign key={index} campaign={campaign} />;
-          })}
+          {children}
         </div>
         <CarouselBtn
           className={!needsScroll ? `opacity-0` : ``}

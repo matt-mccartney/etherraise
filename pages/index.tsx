@@ -10,7 +10,7 @@ import Campaign from "@/components/Campaign/Campaign";
 import { Campaign as CampaignType } from "@/library/types/Campaign";
 import { useWeb3 } from "@/components/Web3Auth/Web3Context";
 import NotConnected from "@/components/NotConnected/NotConnected";
-import CampaignCarousel from "@/components/Campaign/CampaignCarousel";
+import CampaignCarousel from "@/components/Carousel/Carousel";
 
 const PageSection = tw.div<any>`max-w-[1200px] mx-auto py-8`;
 
@@ -63,7 +63,11 @@ export default function Home() {
               <Showcase data={campaigns !== undefined ? campaigns : []} />
             </PageSection>
             <PageSection id="campaigns">
-              <CampaignCarousel title={`Popular Projects`} campaigns={campaigns}/>
+              <CampaignCarousel title={`Popular Projects`}>
+                {campaigns?.map((campaign, index) => {
+                  return <Campaign key={index} campaign={campaign} />;
+                })}
+              </CampaignCarousel>
             </PageSection>
           </>
         )}
